@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: microservices-app
+spec:
+  type: NodePort  # ou LoadBalancer si sur un Cloud
+  selector:
+    app: frontend
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080  # accessible via http://<IP>:30080
