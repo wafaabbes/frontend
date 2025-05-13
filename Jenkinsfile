@@ -21,11 +21,10 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'npm ci'    // Plus rapide et plus sûr que 'npm install' en CI
+                // Ajout de --legacy-peer-deps pour éviter les conflits de dépendances
+                sh 'npm ci --legacy-peer-deps'
             }
         }
-
-       
 
         stage('Build Docker Image') {
             steps {
@@ -57,7 +56,6 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'kubeeconfig', variable: 'KUBECONFIG')]) {
                     script {
-                        // Déployer avec kubectl
                         sh """
                             export KUBECONFIG=${KUBECONFIG}
                             kubectl apply -f k8s/frontend-deployment.yaml
