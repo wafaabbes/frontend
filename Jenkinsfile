@@ -19,9 +19,16 @@ pipeline {
             }
         }
 
+        stage('Inject .env') {
+            steps {
+                withCredentials([file(credentialsId: 'frontend-dotenv', variable: 'ENV_FILE')]) {
+                    sh 'cp $ENV_FILE .env'
+                }
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
-                // Ajout de --legacy-peer-deps pour éviter les conflits de dépendances
                 sh 'npm ci --legacy-peer-deps'
             }
         }
