@@ -21,14 +21,22 @@ pipeline {
 
         stage('Inject .env') {
             steps {
-                withCredentials([file(credentialsId: 'frontend-dotenv', variable: 'ENV_FILE')]) {
-                    sh 'cp $ENV_FILE .env'
+                script {
+                    // Vérifie que la variable $ENV_FILE est correctement définie et accessible
+                    echo "Injecting .env file..."
+                    if (fileExists("${ENV_FILE}")) {
+                        echo ".env file found, copying..."
+                        sh 'cp $ENV_FILE .env'
+                    } else {
+                        error ".env file not found!"
+                    }
                 }
             }
         }
 
         stage('Install Dependencies') {
             steps {
+                echo "Installing dependencies with npm ci..."
                 sh 'npm ci --legacy-peer-deps'
             }
         }
@@ -38,6 +46,7 @@ pipeline {
                 script {
                     def commitHash = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
                     def imageTag = "${DOCKER_IMAGE}:${commitHash}"
+                    echo "Building Docker image with tag: ${imageTag}"
                     sh "docker build -t ${imageTag} ."
                     env.IMAGE_TAG = imageTag
                 }
@@ -51,6 +60,7 @@ pipeline {
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
+                    echo "Logging into DockerHub and pushing image..."
                     sh """
                         echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
                         docker push "${IMAGE_TAG}"
@@ -63,6 +73,7 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'kubeeconfig', variable: 'KUBECONFIG')]) {
                     script {
+                        echo "Deploying to K3s cluster..."
                         sh """
                             export KUBECONFIG=${KUBECONFIG}
                             kubectl apply -f k8s/frontend-deployment.yaml
