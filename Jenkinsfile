@@ -19,20 +19,6 @@ pipeline {
             }
         }
 
-        stage('Inject .env') {
-            steps {
-                script {
-                    // Vérifie que la variable $ENV_FILE est correctement définie et accessible
-                    echo "Injecting .env file..."
-                    if (fileExists("${ENV_FILE}")) {
-                        echo ".env file found, copying..."
-                        sh 'cp $ENV_FILE .env'
-                    } else {
-                        error ".env file not found!"
-                    }
-                }
-            }
-        }
 
         stage('Install Dependencies') {
             steps {
