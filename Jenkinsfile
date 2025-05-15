@@ -26,13 +26,7 @@ pipeline {
             }
         }
 
-        stage('Build App') {
-            steps {
-                sh 'npm run build'
-            }
-        }
-
-        stage('Build Docker Image') {   // 🛠️ Corrigé ici les caractères HTML encodés
+        stage('Build Docker Image') {
             steps {
                 script {
                     def commitHash = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
@@ -67,7 +61,7 @@ pipeline {
                         echo "Deploying to K3s cluster..."
                         sh """
                             export KUBECONFIG=${KUBECONFIG}
-                            sed 's|tagname|${IMAGE_TAG.split(":")[1]}|g' k8s/frontend-deployment.yaml | kubectl apply -f -
+                            kubectl apply -f k8s/frontend-deployment.yaml
                             kubectl apply -f k8s/frontend-service.yaml
                         """
                     }
