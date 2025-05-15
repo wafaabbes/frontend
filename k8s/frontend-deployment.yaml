@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: wafa23/frontendd:tagname
+          image: wafa23/frontendd:tagname  # Remplace tagname par ton vrai tag
           ports:
             - containerPort: 80
           env:
@@ -33,3 +33,6 @@ spec:
               port: 80
             initialDelaySeconds: 15
             periodSeconds: 20
+      imagePullSecrets:
+        - name: regcred  # 👈 Ajout ici
+ 
