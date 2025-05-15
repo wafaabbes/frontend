@@ -26,6 +26,13 @@ pipeline {
             }
         }
 
+        stage('Build') {
+            steps {
+                echo "Building the Next.js app..."
+                sh 'npm run build'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -54,17 +61,21 @@ pipeline {
             }
         }
 
-        stage('Deploy to K3s') {
+        stage('Update Kubernetes Deployment') {
             steps {
                 withCredentials([file(credentialsId: 'kubeeconfig', variable: 'KUBECONFIG')]) {
                     script {
-                        echo "Deploying to K3s cluster with image ${env.IMAGE_TAG} ..."
+                        echo "Updating Kubernetes deployment image..."
+
+                        // Remplace dans le fichier YAML temporaire l’image par la bonne image taguée
+                        sh """
+                            sed -i 's|image: wafa23/ui:.*|image: ${IMAGE_TAG}|' k8s/frontend-deployment.yaml
+                        """
+
                         sh """
                             export KUBECONFIG=${KUBECONFIG}
-                            # Remplacement dynamique du tag dans le fichier de déploiement
-                            sed "s|image: wafa23/ui:__IMAGE_TAG__|image: ${env.IMAGE_TAG}|g" k8s/frontend-deployment.yaml > k8s/frontend-deployment-temp.yaml
-                            kubectl apply -f k8s/frontend-deployment-temp.yaml
-                            kubectl apply -f k8s/frontend-service.yaml
+                            kubectl apply -f k8s/frontend-deployment.yaml -n microservices-app
+                            kubectl rollout restart deployment frontend -n microservices-app
                         """
                     }
                 }
