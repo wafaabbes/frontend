@@ -32,7 +32,7 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build Docker Image') {   // 🛠️ Corrigé ici les caractères HTML encodés
             steps {
                 script {
                     def commitHash = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
