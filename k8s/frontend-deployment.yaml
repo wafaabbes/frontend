@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: wafa23/ui  # Remplace tagname par ton vrai tag
+          image: wafa23/ui:abc123  # Remplace tagname par ton vrai tag
           ports:
             - containerPort: 80
           env:
