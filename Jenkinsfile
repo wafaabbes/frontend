@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "wafa23/frontendd"
+        DOCKER_IMAGE = "wafa23/ui"
     }
 
     options {
@@ -19,11 +19,16 @@ pipeline {
             }
         }
 
-
         stage('Install Dependencies') {
             steps {
                 echo "Installing dependencies with npm ci..."
                 sh 'npm ci --legacy-peer-deps'
+            }
+        }
+
+        stage('Build App') {
+            steps {
+                sh 'npm run build'
             }
         }
 
@@ -62,7 +67,7 @@ pipeline {
                         echo "Deploying to K3s cluster..."
                         sh """
                             export KUBECONFIG=${KUBECONFIG}
-                            kubectl apply -f k8s/frontend-deployment.yaml
+                            sed 's|tagname|${IMAGE_TAG.split(":")[1]}|g' k8s/frontend-deployment.yaml | kubectl apply -f -
                             kubectl apply -f k8s/frontend-service.yaml
                         """
                     }
