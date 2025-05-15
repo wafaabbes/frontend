@@ -63,7 +63,7 @@ pipeline {
                             export KUBECONFIG=${KUBECONFIG}
                             # Remplacement dynamique du tag dans le fichier de déploiement
                             sed "s|image: wafa23/ui:__IMAGE_TAG__|image: ${env.IMAGE_TAG}|g" k8s/frontend-deployment.yaml > k8s/frontend-deployment-temp.yaml
-                            kubectl apply -f k8s/frontend-deployment-temp.yaml
+                            kubectl apply -f k8s/frontend-deployment.yaml
                             kubectl apply -f k8s/frontend-service.yaml
                         """
                     }
