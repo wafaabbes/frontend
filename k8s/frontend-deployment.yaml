@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: wafa23/ui:abc123  # Remplace tagname par ton vrai tag
+          image: wafa23/ui:__IMAGE_TAG__   # <-- tag à remplacer dynamiquement
           ports:
             - containerPort: 80
           env:
@@ -34,5 +34,4 @@ spec:
             initialDelaySeconds: 15
             periodSeconds: 20
       imagePullSecrets:
-        - name: regcred  # 👈 Ajout ici
- 
+        - name: regcred
