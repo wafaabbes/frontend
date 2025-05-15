@@ -26,12 +26,7 @@ pipeline {
             }
         }
 
-        stage('Build') {
-            steps {
-                echo "Building Next.js app..."
-                sh 'npm run build'
-            }
-        }
+     
 
         stage('Build Docker Image') {
             steps {
